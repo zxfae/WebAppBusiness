@@ -40,7 +40,7 @@ export default function ChartsNmensuel(){
             datasets: [
               {
                 label: 'N jours travaillés par mois.',
-                data: Utils.numbers({ count: 12, min: -100, max: 100 }),
+                data: Utils.numbers({ count: 12, min: 0, max: 40 }),
                 borderColor: Utils.CHART_COLORS.Orange,
                 fill: false,
                 stepped: true,

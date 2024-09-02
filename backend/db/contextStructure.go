@@ -7,6 +7,7 @@ import (
 )
 
 func InsertStructure(ctx context.Context, structure modals.Structure, userId string) (int, *errorModels) {
+
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return 0, &errorModels{Error: err, Message: "Failed to begin tx", Code: 8}

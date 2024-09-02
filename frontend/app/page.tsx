@@ -33,6 +33,8 @@ export default function Home() {
                 return <h1 className="text-gray-800 text-2xl font-bold">Plan Trésorerie</h1>;
             case 'amortissement':
                 return <h1 className="text-gray-800 text-2xl font-bold">Amortissement Linéaire</h1>;
+            case 'production':
+                return <h1 className="text-gray-800 text-2xl font-bold">Production</h1>;
             default:
                 return <UserProfileForm onLoginSuccess={handleLoginSuccess} />;
         }
@@ -87,6 +89,21 @@ export default function Home() {
                                 }`}
                             >
                                 Structure de l'entreprise
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={() => {
+                                    if (isAuthenticated) setActiveSection('production');
+                                }}
+                                aria-pressed={activeSection === 'production'}
+                                className={`block py-2 px-4 rounded-lg text-left w-full ${
+                                    activeSection === 'production'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-700 hover:bg-gray-200'
+                                }`}
+                            >
+                                Production
                             </button>
                         </li>
                         <li>

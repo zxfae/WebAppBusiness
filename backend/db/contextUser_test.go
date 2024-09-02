@@ -46,38 +46,35 @@ func TestRegisterUser(t *testing.T) {
 			},
 			mockSetup: func() {
 				HashPasswordFunc = func(password string) (string, error) {
-					return "mockHashedPassword", nil
+					return "HashPassword", nil
 				}
 				GenerateSessionIDFunc = func() string {
-					return "generated-uuid"
+					return "UUID"
 				}
 				mock.ExpectBegin()
 				mock.ExpectQuery(`INSERT INTO users\(userid, lastname, firstname, email, password\) VALUES \(\$1, \$2, \$3, \$4, \$5\) RETURNING id`).
-					WithArgs("generated-uuid", "Doe", "John", "john.doe@example.com", "mockHashedPassword").
+					WithArgs("UUD", "Doe", "John", "john.doe@example.com", "HashPassword").
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 				mock.ExpectCommit()
 			},
 			expectedID:     1,
-			expectedUserId: "generated-uuid",
+			expectedUserId: "UUID",
 			expectedError:  nil,
 		},
-		// Add other test cases here
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.mockSetup()
+	for _, testingElement := range tests {
+		t.Run(testingElement.name, func(t *testing.T) {
+			testingElement.mockSetup()
 
-			id, userId, errModels := RegisterUser(context.Background(), tt.user)
+			id, userId, errModels := RegisterUser(context.Background(), testingElement.user)
 
-			if id != tt.expectedID {
-				t.Errorf("expected id %d, got %d", tt.expectedID, id)
+			if id != testingElement.expectedID {
+				t.Errorf("expected id %d, got %d", testingElement.expectedID, id)
+				t.Errorf("expected userId %s, got %s", testingElement.expectedUserId, userId)
 			}
-			if userId != tt.expectedUserId {
-				t.Errorf("expected userId %s, got %s", tt.expectedUserId, userId)
-			}
-			if errModels != nil && errModels.Message != tt.expectedError.Message {
-				t.Errorf("expected error message %s, got %s", tt.expectedError.Message, errModels.Message)
+			if errModels != nil && errModels.Message != testingElement.expectedError.Message {
+				t.Errorf("expected error message %s, got %s", testingElement.expectedError.Message, errModels.Message)
 			}
 		})
 	}
