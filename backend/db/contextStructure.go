@@ -3,14 +3,13 @@ package database
 import (
 	"WebAppFinance/backend/modals"
 	"context"
-	"log"
 )
 
 func InsertStructure(ctx context.Context, structure modals.Structure, userId string) (int, *errorModels) {
 
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, &errorModels{Error: err, Message: "Failed to begin tx", Code: 8}
+		return 0, &errorModels{Error: err, Message: "Failed to begin tx structure", Code: 8}
 	}
 	defer tx.Rollback()
 
@@ -26,7 +25,6 @@ func InsertStructure(ctx context.Context, structure modals.Structure, userId str
 		userId, structure.Name, structure.Codeape, structure.Statut, structure.Date,
 	).Scan(&structureId)
 	if err != nil {
-		log.Printf("Error inserting into structure table: %v", err)
 		return 0, &errorModels{Error: err, Message: "Failed to insert query to structure table", Code: 9}
 	}
 
@@ -40,8 +38,7 @@ func InsertStructure(ctx context.Context, structure modals.Structure, userId str
 		structureId, structure.JoursAnnuels, structure.JoursWeekend, structure.JoursCongésPayés, structure.JoursFériés,
 	)
 	if err != nil {
-		log.Printf("Error inserting into decompte_jours table: %v", err)
-		return 0, &errorModels{Error: err, Message: "Failed to insert query to decompte_jours table", Code: 10}
+		return 0, &errorModels{Error: err, Message: "Failed to insert query to decompte_jours table structure", Code: 10}
 	}
 
 	decompteMensuelQuery := `
@@ -60,14 +57,12 @@ func InsertStructure(ctx context.Context, structure modals.Structure, userId str
 		structure.DecompteMensuel.Octobre, structure.DecompteMensuel.Novembre, structure.DecompteMensuel.Decembre,
 	)
 	if err != nil {
-		log.Printf("Error inserting into decompte_mensuel table: %v", err)
-		return 0, &errorModels{Error: err, Message: "Failed to insert query to decompte_mensuel table", Code: 11}
+		return 0, &errorModels{Error: err, Message: "Failed to insert query to decompte_mensuel table structure", Code: 11}
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		log.Printf("Error committing transaction: %v", err)
-		return 0, &errorModels{Error: err, Message: "Failed to commit transaction", Code: 12}
+		return 0, &errorModels{Error: err, Message: "Failed to commit transaction structure", Code: 12}
 	}
 	return structureId, nil
 }

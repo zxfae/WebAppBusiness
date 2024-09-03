@@ -45,3 +45,25 @@ type DecompteMensuel struct {
 	Novembre  int `json:"novembre"`
 	Decembre  int `json:"decembre"`
 }
+
+type Production struct {
+	Production              int                     `json:"production"`
+	GestionClient           int                     `json:"gestionclient"`
+	Interprofession         int                     `json:"interprofession"`
+	Formation               int                     `json:"formation"`
+	Entretien               int                     `json:"entretien"`
+	ProductionDetail        ProductionDetail        `json:"productionDetail"`
+	ProductionFinanceDetail ProductionFinanceDetail `json:"ProductionFinanceDetail"`
+}
+
+type ProductionDetail struct {
+	Productionjours int `json:"productionjours"`
+	Productionann   int `json:"productionann"`
+}
+
+type ProductionFinanceDetail struct {
+	Tva      int `json:"tva"`
+	Prixserv int `json:"prixserv"`
+	Cajours  int `json:"cajours"`
+	Caann    int `json:"caann"`
+}

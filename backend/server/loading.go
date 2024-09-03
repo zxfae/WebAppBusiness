@@ -30,6 +30,7 @@ func LoadServer() *mux.Router {
 
 	router.Handle("/users", http.HandlerFunc(userHandler))
 	router.Handle("/structure", http.HandlerFunc(structureHandler))
+	router.Handle("/production", http.HandlerFunc(productionHandler))
 
 	router.HandleFunc("/login", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)

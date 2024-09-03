@@ -17,6 +17,10 @@ func createAllTables() *errorModels {
 		createTableStructure,
 		createTableDecompteJours,
 		createTableDecompteMensuel,
+		createProductionTable,
+		createProductionTable,
+		createProdDetails,
+		createProdFinanceDetails,
 	}
 
 	for _, table := range tables {

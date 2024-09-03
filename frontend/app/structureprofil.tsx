@@ -191,7 +191,7 @@ export default function StructureProfilForm() {
             case 1:
                 return (
                     <>
-                        <h2 className="text-gray-800 text-4xl bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent font-semibold mb-4">
+                        <h2 className="text-4xl bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent font-semibold mb-4">
                             1 - Base de votre entreprise
                         </h2>
                         <p className="text-black text-center mb-2 text-xl font-medium">

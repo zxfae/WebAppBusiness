@@ -5,7 +5,7 @@ import TextInput from './components/textInputuser';
 import MyImg from './components/myimg';
 
 interface UserProfileFormProps {
-    onLoginSuccess: () => void; // Define the prop type
+    onLoginSuccess: () => void;
 }
 
 export default function UserProfileForm({ onLoginSuccess }: UserProfileFormProps) {

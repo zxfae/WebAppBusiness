@@ -37,7 +37,7 @@ func LoginUser(ctx context.Context, user modals.User) (int, *errorModels) {
 func RegisterUser(ctx context.Context, user modals.User) (int, string, *errorModels) {
 	transaction, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, "", &errorModels{Error: err, Message: "Failed to begin transaction", Code: 3}
+		return 0, "", &errorModels{Error: err, Message: "Failed to begin transaction user", Code: 3}
 	}
 	defer transaction.Rollback()
 
@@ -56,7 +56,7 @@ func RegisterUser(ctx context.Context, user modals.User) (int, string, *errorMod
 
 	err = transaction.Commit()
 	if err != nil {
-		return 0, "", &errorModels{Error: err, Message: "Failed to commit transaction", Code: 6}
+		return 0, "", &errorModels{Error: err, Message: "Failed to commit transaction user", Code: 6}
 	}
 
 	return userID, userId, nil

@@ -135,3 +135,83 @@ func structureHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 }
+
+// Handler for inserting a production
+func productionHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Received request to productionHandler")
+
+	// Method must be POST. Check method
+	if r.Method != http.MethodPost {
+		handleError(w, nil, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Get and validate the session cookie
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		handleError(w, err, "Unauthorized: No session cookie", http.StatusUnauthorized)
+		return
+	}
+	sessionID := cookie.Value
+	log.Printf("Session ID: %s", sessionID)
+
+	// Check if session exists and is valid
+	sessionManager.mutex.Lock()
+	session, exists := sessionManager.sessions[sessionID]
+	sessionManager.mutex.Unlock()
+
+	if !exists || time.Now().After(session.Expiry) {
+		log.Printf("Session not found or expired for ID: %s", sessionID)
+		handleError(w, nil, "Unauthorized: Invalid or expired session", http.StatusUnauthorized)
+		return
+	}
+
+	// Read request body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		handleError(w, err, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	log.Printf("Request body: %s", string(body))
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	// Decode JSON payload into Production struct
+	var prod modals.Production
+	if err := json.NewDecoder(r.Body).Decode(&prod); err != nil {
+		handleError(w, err, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	log.Printf("Decoded production: %+v", prod)
+
+	// Initialize ProductionDetail and ProductionFinanceDetail structs (you should replace these with actual data)
+	var productionDetail modals.ProductionDetail
+	var prodFinanceDetails modals.ProductionFinanceDetail
+
+	// Check if the user exists before inserting the production
+	userExists, err := database.CheckUserExists(r.Context(), session.UserID)
+	if err != nil || !userExists {
+		log.Printf("Error checking user existence for ID: %s", session.UserID)
+		handleError(w, err, "Invalid user ID: User does not exist", http.StatusBadRequest)
+		return
+	}
+
+	// Insert the production into the database
+	productionID, errModel := database.InsertProduction(r.Context(), prod, productionDetail, prodFinanceDetails, session.UserID)
+	if errModel != nil {
+		handleError(w, errModel.Error, "Failed to insert production", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Production created successfully with ID: %d", productionID)
+
+	// Set the content-type header and return a successful response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(modals.Response{
+		Message: "Production created successfully",
+		Data: map[string]interface{}{
+			"productionId": productionID,
+		},
+	})
+}

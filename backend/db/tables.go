@@ -1,7 +1,6 @@
 package database
 
 // User table
-// User table
 func createTableUser() *errorModels {
 	query := `
         CREATE TABLE IF NOT EXISTS users (
@@ -16,7 +15,7 @@ func createTableUser() *errorModels {
 	return executeQuery(query, "users")
 }
 
-// Structure table
+// Structure tables
 func createTableStructure() *errorModels {
 	query := `
     CREATE TABLE IF NOT EXISTS structure(
@@ -30,8 +29,6 @@ func createTableStructure() *errorModels {
     )`
 	return executeQuery(query, "structure")
 }
-
-// Décompte des jours table
 func createTableDecompteJours() *errorModels {
 	query := `
     CREATE TABLE IF NOT EXISTS decompte_jours(
@@ -45,8 +42,6 @@ func createTableDecompteJours() *errorModels {
     )`
 	return executeQuery(query, "decompte_jours")
 }
-
-// Décompte mensuel table
 func createTableDecompteMensuel() *errorModels {
 	query := `
     CREATE TABLE IF NOT EXISTS decompte_mensuel(
@@ -67,4 +62,47 @@ func createTableDecompteMensuel() *errorModels {
         FOREIGN KEY(structure_id) REFERENCES structure(id)
     )`
 	return executeQuery(query, "decompte_mensuel")
+}
+
+func createProductionTable() *errorModels {
+	query := `
+    CREATE TABLE IF NOT EXISTS production(
+        id SERIAL PRIMARY KEY,
+        userId TEXT NOT NULL,
+        production INTEGER NOT NULL,
+        gestionClients INTEGER NOT NULL,
+        interprofession INTEGER NOT NULL,
+        formation INTEGER NOT NULL,
+        entretien INTEGER NOT NULL,
+        FOREIGN KEY(userId) REFERENCES users(userId)
+    )
+    `
+	return executeQuery(query, "production")
+}
+
+func createProdDetails() *errorModels {
+	query := `
+    CREATE TABLE IF NOT EXISTS prodDetails(
+        id SERIAL PRIMARY KEY,
+        prod_id INT NOT NULL,
+        productionjours INT NOT NULL,
+        productionann INT NOT NULL,
+        FOREIGN KEY(prod_id) REFERENCES production(id)
+
+    )`
+	return executeQuery(query, "prodDetails")
+}
+
+func createProdFinanceDetails() *errorModels {
+	query := `
+    CREATE TABLE IF NOT EXISTS prodFinanceDetails(
+        id SERIAL PRIMARY KEY,
+        prod_id INT NOT NULL,
+        tva INT NOT NULL,
+        prixserv INT NOT NULL,
+        cajours INT NOT NULL,
+        caann INT NOT NULL,
+        FOREIGN KEY(prod_id) REFERENCES production(id)
+    )`
+	return executeQuery(query, "prodFinanceDetails")
 }

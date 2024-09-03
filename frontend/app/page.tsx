@@ -4,19 +4,21 @@ import { useState } from 'react';
 import UserProfileForm from '../app/userprofil';
 import StructureProfilForm from './structureprofil';
 import DashBoard from './dashboard';
+import ProductionTableForm from './production';
 
 export default function Home() {
+    //OK state
     const [activeSection, setActiveSection] = useState('connexion');
-    const [isAuthenticated, setIsAuthenticated] = useState(false); // État pour suivre l'authentification
+    //AuthentificationStatut
+    const [isAuth, setIsAuth] = useState(false);
 
     const handleLoginSuccess = () => {
-        setIsAuthenticated(true);
-        setActiveSection('dashboard'); // Redirige vers le tableau de bord après la connexion
+        setIsAuth(true);
+        setActiveSection('dashboard');
     };
 
     const renderContent = () => {
-        if (!isAuthenticated && activeSection !== 'connexion') {
-            // Si l'utilisateur n'est pas authentifié, redirigez vers la page de connexion
+        if (!isAuth && activeSection !== 'connexion') {
             return <UserProfileForm onLoginSuccess={handleLoginSuccess} />;
         }
 
@@ -34,7 +36,7 @@ export default function Home() {
             case 'amortissement':
                 return <h1 className="text-gray-800 text-2xl font-bold">Amortissement Linéaire</h1>;
             case 'production':
-                return <h1 className="text-gray-800 text-2xl font-bold">Production</h1>;
+                return <ProductionTableForm />;
             default:
                 return <UserProfileForm onLoginSuccess={handleLoginSuccess} />;
         }
@@ -49,7 +51,7 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuthenticated) setActiveSection('connexion');
+                                    if (isAuth) setActiveSection('connexion');
                                 }}
                                 aria-pressed={activeSection === 'profile'}
                                 className={`block py-2 px-4 rounded-lg text-left w-full ${
@@ -64,7 +66,7 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuthenticated) setActiveSection('dashboard');
+                                    if (isAuth) setActiveSection('dashboard');
                                 }}
                                 aria-pressed={activeSection === 'dashboard'}
                                 className={`block py-2 px-4 rounded-lg text-left w-full ${
@@ -79,7 +81,7 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuthenticated) setActiveSection('basic');
+                                    if (isAuth) setActiveSection('basic');
                                 }}
                                 aria-pressed={activeSection === 'basic'}
                                 className={`block py-2 px-4 rounded-lg text-left w-full ${
@@ -94,7 +96,7 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuthenticated) setActiveSection('production');
+                                    if (isAuth) setActiveSection('production');
                                 }}
                                 aria-pressed={activeSection === 'production'}
                                 className={`block py-2 px-4 rounded-lg text-left w-full ${
@@ -109,7 +111,7 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuthenticated) setActiveSection('financement');
+                                    if (isAuth) setActiveSection('financement');
                                 }}
                                 aria-pressed={activeSection === 'financement'}
                                 className={`block py-2 px-4 rounded-lg text-left w-full ${
@@ -124,7 +126,7 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuthenticated) setActiveSection('tresorerie');
+                                    if (isAuth) setActiveSection('tresorerie');
                                 }}
                                 aria-pressed={activeSection === 'tresorerie'}
                                 className={`block py-2 px-4 rounded-lg text-left w-full ${
@@ -139,7 +141,7 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuthenticated) setActiveSection('amortissement');
+                                    if (isAuth) setActiveSection('amortissement');
                                 }}
                                 aria-pressed={activeSection === 'amortissement'}
                                 className={`block py-2 px-4 rounded-lg text-left w-full ${

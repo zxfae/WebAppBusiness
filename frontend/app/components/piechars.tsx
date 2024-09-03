@@ -29,12 +29,12 @@ export default function ChartsNmensuel() {
                 }
 
                 const data = {
-                    labels: ['Production - CA', 'Gestion clientele - Devis', 'Interprofession', 'formation'],
+                    labels: ['Production - CA', 'Gestion clientele - Devis', 'Interprofession', 'Formation', 'Entretien'],
                     datasets: [{
-                        label: 'N jours',
-                        data: [25, 3, 1, 5],
+                        label: 'Jours travaill',
+                        data: [25, 3, 1, 5, 3],
                         borderWidth: 1,
-                        backgroundColor: ['#27AE60', '#CB4335','#CB4335','#CB4335'],
+                        backgroundColor: ['#27AE60', '#CB4335','#CB4335','#CB4335', '#CB4335'],
                     }]
                 };
 
