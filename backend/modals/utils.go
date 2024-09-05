@@ -52,7 +52,7 @@ type Production struct {
 	Interprofession         int                     `json:"interprofession"`
 	Formation               int                     `json:"formation"`
 	Entretien               int                     `json:"entretien"`
-	ProductionDetail        ProductionDetail        `json:"productionDetail"`
+	ProductionDetail        ProductionDetail        `json:"ProductionDetail"`
 	ProductionFinanceDetail ProductionFinanceDetail `json:"ProductionFinanceDetail"`
 }
 

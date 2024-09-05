@@ -1,15 +1,16 @@
 "use client";
 
+import ChartsNmensuel from "./components/charsnmensuel";
 import TextInput from "./components/textInputuser";
 import { FormEvent, ChangeEvent, useState, useEffect } from "react";
 
 export default function StructureProfilForm() {
     const [step, setStep] = useState(1);
     const [structureData, setStructureData] = useState({
-        name: '',
-        codeape: '',
-        statut: '',
-        date: ''
+        name: 'q',
+        codeape: 'q',
+        statut: 'q',
+        date: '11-11-1111'
     });
 
     const [decompteData, setDecompteData] = useState({
@@ -20,8 +21,8 @@ export default function StructureProfilForm() {
     });
 
     const [decompteMensuel, setDecompteMensuel] = useState({
-        janvier: '10', fevrier: '10', mars: '10', avril: '10', mai: '10', juin: '10',
-        juillet: '10', aout: '10', septembre: '10', octobre: '10', novembre: '10', decembre: '10'
+        janvier: '0', fevrier: '0', mars: '0', avril: '0', mai: '0', juin: '0',
+        juillet: '0', aout: '0', septembre: '0', octobre: '0', novembre: '0', decembre: '0'
     });
 
     const [joursRestants, setJoursRestants] = useState(0);
@@ -92,11 +93,11 @@ export default function StructureProfilForm() {
                 if (response.ok) {
                     alert('Structure créée avec succès!');
                 } else {
-                    const errorData = await response.json();
-                    alert(`Erreur: ${errorData.message || 'Erreur lors de la création de la structure'}`);
+                    const ErrData = await response.json();
+                    alert(`Erreur: ${ErrData.message || 'Erreur lors de la création de la structure'}`);
                 }
-            } catch (error) {
-                console.error('Erreur:', error);
+            } catch (Err) {
+                console.Err('Erreur:', Err);
                 alert('Erreur lors de la création de la structure');
                 setIsLoading(false);
             }
@@ -263,6 +264,7 @@ export default function StructureProfilForm() {
                         <p className="mt-4 text-black text-center mb-2 text-xl font-medium">
                             Indiquez le nombre de jours travaillés pour <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent font-semibold">chaque mois</span>. Cette répartition affine nos calculs et <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent font-semibold">prend en compte les variations saisonnières</span> de votre activité.
                         </p>
+                        <ChartsNmensuel decompteMensuel={decompteMensuel} />
                     </>
                 );
         }
@@ -275,7 +277,7 @@ export default function StructureProfilForm() {
                     <h2 className="text-center text-4xl bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent font-semibold mb-2">
                         Structure
                     </h2>
-                    <h2 className="text-center text-4xl bg-gradient-to-r from-blue-950 to-blue-800 bg-clip-text text-transparent font-semibold mb-6">
+                    <h2 className="text-center text-4xl bg-gradient-to-r from-blue-950 to-blue-800 bg-clip-text text-transparent font-semibold">
                         De votre entreprise
                     </h2>
                     <form onSubmit={handleSubmit}>

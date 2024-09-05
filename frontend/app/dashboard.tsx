@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import ChartsNmensuel from './components/charsnmensuel';
-import PieChars from './components/piechars';
+import PieChars from './components/prodcharts';
 import ChartsEncDec from './components/encDecCharts';
 import Image from 'next/image';
+import ChartsProd from './components/prodcharts';
 
 
 export default function DashBoard() {
@@ -17,10 +18,10 @@ export default function DashBoard() {
       title: 'N jours travaillés par mois.', 
       content: 'Content for card 4'
     },
-    { title: 'Card 3', content: <PieChars/> },
+    { title: 'Card 3', content: 'A' },
     { title: 'Card 4', content: 'Content for card 4' },
-    { title: 'Card 5', content: <ChartsNmensuel /> },
-    { title: 'Card 6', content: <ChartsEncDec/> },
+    { title: 'Card 5', content: 'a' },
+    { title: 'Card 6', content: 'A' },
   ];
 
   return (

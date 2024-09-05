@@ -135,8 +135,6 @@ func structureHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 }
-
-// Handler for inserting a production
 func productionHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Received request to productionHandler")
 
@@ -185,9 +183,13 @@ func productionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("Decoded production: %+v", prod)
 
-	// Initialize ProductionDetail and ProductionFinanceDetail structs (you should replace these with actual data)
-	var productionDetail modals.ProductionDetail
-	var prodFinanceDetails modals.ProductionFinanceDetail
+	// Get production details and finance details from the decoded production
+	productionDetail := prod.ProductionDetail
+	prodFinanceDetails := prod.ProductionFinanceDetail
+
+	// Log the production details and finance details
+	log.Printf("ProductionDetail: %+v", productionDetail)
+	log.Printf("ProductionFinanceDetail: %+v", prodFinanceDetails)
 
 	// Check if the user exists before inserting the production
 	userExists, err := database.CheckUserExists(r.Context(), session.UserID)

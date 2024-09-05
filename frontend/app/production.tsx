@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FormEvent, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -13,162 +13,632 @@ import {
 import { DeleteIcon } from "./components/DeleteIcon";
 import { EyeIcon } from "./components/EyeIcon";
 import { EditIcon } from "./components/EditIcon";
-import ChartsNmensuel from "./components/piechars";
+import ChartsNmensuel from "./components/prodcharts";
+import ChartsProd from "./components/prodcharts";
 
-const statusColorMap: Record<string, "success" | "danger" | "warning"> = {
-  Completed: "success",
-  "In Progress": "warning",
+interface ProductionType {
+  id: number;
+  name: string;
+  inputText: JSX.Element | string;
+  status: "Encaissement" | "Rentrée nulle" | "Not Started";
+  avatar: string;
+  actions?: JSX.Element;
+}
+
+const statusColorMap: Record<ProductionType["status"], "success" | "danger" | "warning"> = {
+  "Encaissement": "success",
+  "Rentrée nulle": "danger",
   "Not Started": "danger",
 };
 
-const users = [
-  {
-    id: 1,
-    name: "Production",
-    inputText: "FORMULAIRE saisi par",
-    status: "In Progress",
-    avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+const messagesByStep = {
+  1: {
+    title: "Production",
+    content: (
+      <div>
+        Cette section <span className="bg-gradient-to-r from-blue-800 to-blue-500 bg-clip-text text-transparent font-semibold">mesure la régularité des flux de trésorerie et d'identifier les périodes à optimiser</span>,
+        la répartition du temps de travail <span className="bg-gradient-to-r from-blue-500 to-blue-800 bg-clip-text text-transparent font-semibold">analyse les performances financières </span> en comptabilisant les jours avec et sans encaissement.
+        <br />
+        <span className="bg-gradient-to-r from-red-500 to-red-500  bg-clip-text text-transparent">Sur votre droite, un graphique se met a jour automatiquement des votre saisie</span>
+      </div>
+    ),
   },
-  {
-    id: 2,
-    name: "Gestion Clientèle - devis - Facture",
-    inputText: "Not Started",
-    status: "Not Started",
-    avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+  2: {
+    title: "Détails de la Production",
+    content: (
+      <div>
+        À cette étape, veuillez fournir les détails concernant les jours de production ainsi que les objectifs annuels
+        pour analyser la productivité de votre entreprise.
+      </div>
+    ),
   },
-  {
-    id: 3,
-    name: "Interprofession",
-    inputText: "In Progress",
-    status: "In Progress",
-    avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+  3: {
+    title: "Détails Financiers",
+    content: (
+      <div>
+        Merci de renseigner les données financières telles que la TVA, le prix des services,
+        ainsi que les chiffres d'affaires journaliers et annuels pour compléter l'analyse financière.
+      </div>
+    ),
   },
-  {
-    id: 4,
-    name: "Formation",
-    inputText: "Completed",
-    status: "Completed",
-    avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
-  },
-  {
-    id: 5,
-    name: "Entretien",
-    inputText: "Completed",
-    status: "Completed",
-    avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
-  },
-  
-];
+};
 
-const columns = [
-  { name: "Répartition temps de travail", uid: "name" },
-  { name: "Nombres Jours", uid: "inputText" },
-  { name: "Statut", uid: "status" },
-  { name: "Actions", uid: "actions" },
-];
+const ProductionTableForm: React.FC = () => {
+  const [step, setStep] = useState<1 | 2 >(1);
+  const [productionData, setProductionData] = useState({
+    production: '',
+    gestionclient: '',
+    interprofession: '',
+    formation: '',
+    entretien: ''
+  });
 
+  const [productionDetailData, setProductionDataDetails] = useState({
+    productionjours: '',
+    productionann: '',
+    tva: '',
+    prixserv: '',
+    cajours: '',
+    caann: ''
+  });
 
-export default function App() {
-  const renderCell = React.useCallback(
-    (user: typeof users[0], columnKey: string) => {
-      const cellValue = user[columnKey as keyof typeof user];
+  const [isLoading, setIsLoading] = useState(false);
 
-      switch (columnKey) {
-        case "name":
-          return (
-            <div className="flex flex-col">
-              <p className="text-bold text-4xl capitalize text-default-400">
-                <User description={user.name} name={cellValue as string} />
-              </p>
-            </div>
-          );
-        case "inputText":
-          return (
-            <p className="text-bold text-2xl capitalize text-default-400">
-              {cellValue}
-            </p>
-          );
-        case "status":
-          return (
-            <Chip
-              className="capitalize"
-              color={statusColorMap[cellValue as string]}
-              size="sm"
-              variant="flat"
-            >
-              {cellValue}
-            </Chip>
-          );
-        case "actions":
-          return (
-            <div className="relative flex items-center gap-2">
-              <Tooltip content="Details">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                  <EyeIcon />
-                </span>
-              </Tooltip>
-              <Tooltip content="Edit user">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                  <EditIcon />
-                </span>
-              </Tooltip>
-              <Tooltip color="danger" content="Delete user">
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                  <DeleteIcon />
-                </span>
-              </Tooltip>
-            </div>
-          );
-        default:
-          return cellValue;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (step === 1) {
+      setProductionData(prev => ({ ...prev, [name]: value }));
+    } else if (step === 2) {
+      setProductionDataDetails(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (step < 2) {
+      setStep(step + 1 as 1 | 2);
+    } else {
+      const intData = {
+        Production: parseInt(productionData.production, 10),
+        GestionClient: parseInt(productionData.gestionclient, 10),
+        Interprofession: parseInt(productionData.interprofession, 10),
+        Formation: parseInt(productionData.formation, 10),
+        Entretien: parseInt(productionData.entretien, 10),
+        ProductionDetail: {
+          Productionjours: parseInt(productionDetailData.productionjours, 10),
+          Productionann: parseInt(productionDetailData.productionann, 10),
+        },
+        ProductionFinanceDetail: {
+          Tva: parseInt(productionDetailData.tva, 10),
+          Prixserv: parseInt(productionDetailData.prixserv, 10),
+          Cajours: parseInt(productionDetailData.cajours, 10),
+          Caann: parseInt(productionDetailData.caann, 10),
+        }
+      };
+
+      setIsLoading(true);
+
+      try {
+        const response = await fetch('http://localhost:8080/production', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(intData),
+        });
+        setIsLoading(false);
+
+        if (response.ok) {
+          alert('Production créée avec succès!');
+        } else {
+          const ErrData = await response.json();
+          alert(`Erreur: ${ErrData.message || 'Erreur lors de la création de la Production'}`);
+        }
+      } catch (Err) {
+        console.Err('Erreur:', Err);
+        alert('Erreur lors de la création de la production');
+        setIsLoading(false);
       }
+    }
+  };
+
+  const handlePrevious = () => {
+    if (step > 1) {
+      setStep(step - 1 as 1 | 2);
+    }
+  };
+
+  const production: ProductionType[] = [
+    {
+      id: 1,
+      name: "Production",
+      inputText: (
+        <input
+          type="number"
+          id="production"
+          name="production"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionData.production}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Encaissement",
+      avatar: "https://www.svgrepo.com/show/535118/accessibility.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
     },
-    []
-  );
+    {
+      id: 2,
+      name: "Gestion Clientèle - Facture - Devis",
+      inputText: (
+        <input
+          type="number"
+          id="gestionclient"
+          name="gestionclient"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionData.gestionclient}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Rentrée nulle",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 3,
+      name: "Interprofession",
+      inputText: (
+        <input
+          type="number"
+          id="interprofession"
+          name="interprofession"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionData.interprofession}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Rentrée nulle",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 4,
+      name: "formation",
+      inputText: (
+        <input
+          type="number"
+          id="formation"
+          name="formation"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionData.formation}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Rentrée nulle",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 5,
+      name: "entretien",
+      inputText: (
+        <input
+          type="number"
+          id="entretien"
+          name="entretien"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionData.entretien}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Rentrée nulle",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
+  const productionDetails: ProductionType[] = [
+    {
+      id: 1,
+      name: "Production / Service par jours",
+      inputText: (
+        <input
+          type="number"
+          id="productionjours"
+          name="productionjours"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionDetailData.productionjours}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Rentrée nulle",
+      avatar: "https://www.svgrepo.com/show/535118/accessibility.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 2,
+      name: "Production / Service par an",
+      inputText: (
+        <input
+          type="number"
+          id="productionann"
+          name="productionann"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionDetailData.productionann}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Rentrée nulle",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 3,
+      name: "TVA",
+      inputText: (
+        <input
+          type="number"
+          id="tva"
+          name="tva"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionDetailData.tva}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Rentrée nulle",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 4,
+      name: "Moyenne prix service",
+      inputText: (
+        <input
+          type="number"
+          id="prixserv"
+          name="prixserv"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionDetailData.prixserv}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Not Started",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 6,
+      name: "Chiffre d'affaire annuel",
+      inputText: (
+        <input
+          type="number"
+          id="caann"
+          name="caann"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionDetailData.caann}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Not Started",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
+      id: 5,
+      name: "Chiffre d'affaire journalier",
+      inputText: (
+        <input
+          type="number"
+          id="cajours"
+          name="cajours"
+          min="0"
+          className="border border-gray-300 rounded px-2 py-1 w-full"
+          value={productionDetailData.cajours}
+          onChange={handleChange}
+          required
+        />
+      ),
+      status: "Not Started",
+      avatar: "https://www.svgrepo.com/show/381030/finance-business-money-payment-inflation.svg",
+      actions: (
+        <div className="relative flex items-center gap-2">
+          <Tooltip content="Details">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </span>
+          </Tooltip>
+          <Tooltip content="Edit user">
+            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </span>
+          </Tooltip>
+          <Tooltip color="danger" content="Delete user">
+            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <DeleteIcon />
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
+  const dataToDisplay = step === 1 ? production : productionDetails;
 
   return (
     <div className="container mx-auto p-4">
-      <div className="mb-8">
-        <Table aria-label="Example table with custom cells">
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
-              >
-                {column.name}
-              </TableColumn>
+      <div className="mb-8 flex space-x-4">
+        <div className="bg-slate-100 flex-1 p-4 border border-gray-300 rounded-lg shadow-md">
+          <h2 className="mt-6 mb-10 text-black text-4xl bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent font-semibold mb-4 text-center">
+          <p>{messagesByStep[step].title}</p>
+          </h2>
+          <p className="text-black text-center mb-2 text-xl font-medium">
+          <p>{messagesByStep[step].content}</p>
+          </p>
+        </div>
+        <div className="justify-content-center bg-white flex-1 p-4 border border-gray-300 rounded-lg shadow-md flex items-center justify-center">
+          <div style={{ width: '340px', height: '340px' }} className="justify-content-center bg-white flex-1 p-4 border border-gray-300 rounded-lg shadow-md flex items-center justify-center">
+            {step === 1 && (
+              <ChartsProd
+                data={[
+                  parseInt(productionData.production, 10) || 0,
+                  parseInt(productionData.gestionclient, 10) || 0,
+                  parseInt(productionData.interprofession, 10) || 0,
+                  parseInt(productionData.formation, 10) || 0,
+                  parseInt(productionData.entretien, 10) || 0
+                ]}
+              />
             )}
+          </div>  
+          </div>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <Table aria-label="Example table with custom cells" className="min-w-full">
+          <TableHeader>
+            <TableColumn>Répartition Temps de Travail et d'Activité</TableColumn>
+            <TableColumn>Nombres jours</TableColumn>
+            <TableColumn>Status</TableColumn>
+            <TableColumn>ACTIONS</TableColumn>
           </TableHeader>
-          <TableBody items={users}>
-            {(item) => (
+          <TableBody>
+            {dataToDisplay.map((item) => (
               <TableRow key={item.id}>
-                {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey as string)}</TableCell>
-                )}
+                <TableCell>
+                  <User avatarProps={{ src: item.avatar }} name={item.name} description={item.name} />
+                </TableCell>
+                <TableCell>{item.inputText}</TableCell>
+                <TableCell>
+                  <Chip color={statusColorMap[item.status]}>{item.status}</Chip>
+                </TableCell>
+                <TableCell>{item.actions}</TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
-      </div>
 
-      <div className="flex space-x-4">
-        <div className="bg-slate-100 flex-1 p-4 border border-gray-300 rounded-lg shadow-md">
-          <h2 className="text-black text-4xl bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent font-semibold mb-4 text-center">Production</h2>
-            <p className="text-black text-center mb-2 text-xl font-medium">
-              Afin de mesurer <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent font-semibold">la régularité des flux de trésorerie </span>
-              et <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent font-semibold">d'identifier </span> les périodes <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent font-semibold">à optimiser, </span>
-              La répartition du temps de travail <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent font-semibold">analyse les performances financières </span>
-              en comptabilisant les jours avec et sans encaissement.
-            </p>
+        <div className="flex justify-between mt-4">
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="bg-gray-500 text-white px-4 py-2 rounded"
+            >
+              Précédent
+            </button>
+          )}
+          <button
+            type="submit"
+            className={`${
+              isLoading ? "bg-gray-400" : "bg-blue-500"
+            } text-white px-4 py-2 rounded`}
+            disabled={isLoading}
+          >
+            {step < 2 ? "Suivant" : "Soumettre"}
+          </button>
         </div>
-
-        <div className="justify-content-center bg-white flex-1 p-4 border border-gray-300 rounded-lg shadow-md flex items-center justify-center">
-          <div className="w-2/5">
-            <ChartsNmensuel />
-          </div>
-        </div>
-      </div>
+      </form>
     </div>
   );
-}
+};
+
+export default ProductionTableForm;

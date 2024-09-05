@@ -3,7 +3,6 @@ package database
 import (
 	"WebAppFinance/backend/modals"
 	"context"
-	"log"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,46 +16,44 @@ func LoginUser(ctx context.Context, user modals.User) (int, *errorModels) {
 
 	err := db.QueryRowContext(ctx, query, user.Email).Scan(&hashedPassword)
 	if err != nil {
-		log.Printf("Error querying user: %v", err)
-		return 0, &errorModels{Error: err, Message: "Failed to login User", Code: 7}
+		return 0, &errorModels{Error: err, Message: "Failed to login", Code: ErrFailedToLogin, Details: map[string]interface{}{"Email": user.Email}}
 	}
 
-	log.Printf("Hashed password retrieved for user %s: %s", user.Email, hashedPassword)
 	//Compare the password and hashed password in the db
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(user.Password))
 	if err != nil {
-		log.Printf("Invalid credentials for user %s: %v", user.Email, err)
-		return 0, &errorModels{Error: err, Message: "Invalid credentials", Code: 8}
+		//Debug to term
+		//log.Printf("Invalid credentials for user %s: %v", user.Email, err)
+		return 0, &errorModels{Error: err, Message: "Invalid credentials", Code: ErrInvalidPassword, Details: map[string]interface{}{"Password": user.Password}}
 	}
-	//debug
-	log.Printf("User %s logged in successfully", user.Email)
+
 	//return 1 if ok
 	return 1, nil
 }
 
 func RegisterUser(ctx context.Context, user modals.User) (int, string, *errorModels) {
-	transaction, err := db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, "", &errorModels{Error: err, Message: "Failed to begin transaction user", Code: 3}
+		return 0, "", &errorModels{Error: err, Message: "Failed to begin tx", Code: FailedToBeginTransaction, Details: map[string]interface{}{"tx": tx}}
 	}
-	defer transaction.Rollback()
+	defer tx.Rollback()
 
-	hashedPassword, err := HashPasswordFunc(user.Password)
+	hshPwd, err := HashPasswordFunc(user.Password)
 	if err != nil {
-		return 0, "", &errorModels{Error: err, Message: "Failed to create password hash", Code: 4}
+		return 0, "", &errorModels{Error: err, Message: "Failed create pwd", Code: FailedToInsertQuery, Details: map[string]interface{}{"pwd": hshPwd}}
 	}
 
 	userId := GenerateSessionIDFunc()
 	var userID int
 	userQuery := `INSERT INTO users(userid, lastname, firstname, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING id`
-	err = transaction.QueryRowContext(ctx, userQuery, userId, user.Lastname, user.Firstname, user.Email, hashedPassword).Scan(&userID)
+	err = tx.QueryRowContext(ctx, userQuery, userId, user.Lastname, user.Firstname, user.Email, hshPwd).Scan(&userID)
 	if err != nil {
-		return 0, "", &errorModels{Error: err, Message: "Failed to insert user and retrieve ID", Code: 5}
+		return 0, "", &errorModels{Error: err, Message: "Failed to exec Context U", Code: FailedToInsertQuery, Details: map[string]interface{}{"Query": userQuery}}
 	}
 
-	err = transaction.Commit()
+	err = tx.Commit()
 	if err != nil {
-		return 0, "", &errorModels{Error: err, Message: "Failed to commit transaction user", Code: 6}
+		return 0, "", &errorModels{Error: err, Message: "Failed to commit tx User", Code: FailedToCommitTx, Details: map[string]interface{}{"tx": tx}}
 	}
 
 	return userID, userId, nil

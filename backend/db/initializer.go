@@ -15,7 +15,7 @@ func initialisation() *errorModels {
 	db, err = sql.Open("postgres", connStr)
 
 	if err != nil {
-		return &errorModels{Error: err, Message: "Failed to open DB connection", Code: 1}
+		return &errorModels{Error: err, Message: "Failed connect to db", Code: OpenDbFailed, Details: map[string]interface{}{"db": db}}
 	}
 
 	//Example GP
@@ -27,7 +27,7 @@ func initialisation() *errorModels {
 	db.SetConnMaxLifetime(time.Minute * 3)
 
 	if err = db.Ping(); err != nil {
-		return &errorModels{Error: err, Message: "Failed to ping database", Code: 1}
+		return &errorModels{Error: err, Message: "Ping Db Error", Code: OpenDbFailed, Details: map[string]interface{}{"db": db}}
 	}
 
 	fmt.Println("The database is connected")

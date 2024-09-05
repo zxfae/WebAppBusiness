@@ -17,7 +17,20 @@ type errorModels struct {
 	Error   error
 	Message string
 	Code    int
+	Details map[string]interface{}
 }
+
+const (
+	ErrFailedToLogin         = 1
+	ErrInvalidPassword       = 2
+	FailedToBeginTransaction = 3
+	FailedToInsertQuery      = 4
+	FailedToCommitTx         = 5
+	CreateHashPassword       = 6
+	TableCreationError       = 7
+	OpenDbFailed             = 8
+	PingDbFailed             = 9
+)
 
 var (
 	GenerateSessionIDFunc = GenerateSessionID

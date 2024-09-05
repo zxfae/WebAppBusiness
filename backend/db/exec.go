@@ -6,7 +6,7 @@ func executeQuery(query string, tableName string) *errorModels {
 	_, err := db.Exec(query)
 	if err != nil {
 		fmt.Printf("Erreur lors de la création de la table %s: %v\n", tableName, err)
-		return &errorModels{Error: err, Message: fmt.Sprintf("Échec de la création de la table %s", tableName), Code: 2}
+		return &errorModels{Error: err, Message: fmt.Sprintf("Échec de la création de la table %s", tableName), Code: TableCreationError, Details: map[string]interface{}{"table": tableName}}
 	}
 	return nil
 }

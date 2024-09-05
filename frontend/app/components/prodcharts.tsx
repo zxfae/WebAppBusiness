@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart, ChartConfiguration, ChartEvent, LegendItem } from 'chart.js/auto';
 
-export default function ChartsNmensuel() {
+interface ChartsNmensuelProps {
+  data: number[];
+}
+
+export default function ChartsProd({ data }: ChartsNmensuelProps) {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
 
@@ -20,7 +24,7 @@ export default function ChartsNmensuel() {
     };
 
     useEffect(() => {
-        if (chartRef && chartRef.current) {
+        if (chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
 
             if (ctx) {
@@ -28,19 +32,19 @@ export default function ChartsNmensuel() {
                     chartInstance.current.destroy();
                 }
 
-                const data = {
+                const dataConfig = {
                     labels: ['Production - CA', 'Gestion clientele - Devis', 'Interprofession', 'Formation', 'Entretien'],
                     datasets: [{
                         label: 'Jours travaill',
-                        data: [25, 3, 1, 5, 3],
-                        borderWidth: 1,
+                        data: data,
+                        borderWidth: 0.3,
                         backgroundColor: ['#27AE60', '#CB4335','#CB4335','#CB4335', '#CB4335'],
                     }]
                 };
 
                 const config: ChartConfiguration = {
                     type: 'pie',
-                    data: data,
+                    data: dataConfig,
                     options: {
                         responsive: true,
                         plugins: {
@@ -55,7 +59,7 @@ export default function ChartsNmensuel() {
                 chartInstance.current = new Chart(ctx, config);
             }
         }
-    }, []);
+    }, [data]);
 
     return <canvas ref={chartRef} />;
 }

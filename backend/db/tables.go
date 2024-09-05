@@ -70,7 +70,7 @@ func createProductionTable() *errorModels {
         id SERIAL PRIMARY KEY,
         userId TEXT NOT NULL,
         production INTEGER NOT NULL,
-        gestionClients INTEGER NOT NULL,
+        gestionclient INTEGER NOT NULL,
         interprofession INTEGER NOT NULL,
         formation INTEGER NOT NULL,
         entretien INTEGER NOT NULL,
@@ -84,9 +84,9 @@ func createProdDetails() *errorModels {
 	query := `
     CREATE TABLE IF NOT EXISTS prodDetails(
         id SERIAL PRIMARY KEY,
-        prod_id INT NOT NULL,
-        productionjours INT NOT NULL,
-        productionann INT NOT NULL,
+        prod_id INTEGER NOT NULL,
+        productionjours INTEGER NOT NULL,
+        productionann INTEGER NOT NULL,
         FOREIGN KEY(prod_id) REFERENCES production(id)
 
     )`
@@ -97,11 +97,11 @@ func createProdFinanceDetails() *errorModels {
 	query := `
     CREATE TABLE IF NOT EXISTS prodFinanceDetails(
         id SERIAL PRIMARY KEY,
-        prod_id INT NOT NULL,
-        tva INT NOT NULL,
-        prixserv INT NOT NULL,
-        cajours INT NOT NULL,
-        caann INT NOT NULL,
+        prod_id INTEGER NOT NULL,
+        tva INTEGER NOT NULL,
+        prixserv INTEGER NOT NULL,
+        cajours INTEGER NOT NULL,
+        caann INTEGER NOT NULL,
         FOREIGN KEY(prod_id) REFERENCES production(id)
     )`
 	return executeQuery(query, "prodFinanceDetails")

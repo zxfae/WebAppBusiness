@@ -9,7 +9,7 @@ func InsertStructure(ctx context.Context, structure modals.Structure, userId str
 
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, &errorModels{Error: err, Message: "Failed to begin tx structure", Code: 8}
+		return 0, &errorModels{Error: err, Message: "Failed to begin tx", Code: FailedToBeginTransaction, Details: map[string]interface{}{"tx": tx}}
 	}
 	defer tx.Rollback()
 
@@ -25,7 +25,7 @@ func InsertStructure(ctx context.Context, structure modals.Structure, userId str
 		userId, structure.Name, structure.Codeape, structure.Statut, structure.Date,
 	).Scan(&structureId)
 	if err != nil {
-		return 0, &errorModels{Error: err, Message: "Failed to insert query to structure table", Code: 9}
+		return 0, &errorModels{Error: err, Message: "Failed to exec context S", Code: FailedToInsertQuery, Details: map[string]interface{}{"Query": structureQuery}}
 	}
 
 	decompteJoursQuery := `
@@ -38,7 +38,7 @@ func InsertStructure(ctx context.Context, structure modals.Structure, userId str
 		structureId, structure.JoursAnnuels, structure.JoursWeekend, structure.JoursCongésPayés, structure.JoursFériés,
 	)
 	if err != nil {
-		return 0, &errorModels{Error: err, Message: "Failed to insert query to decompte_jours table structure", Code: 10}
+		return 0, &errorModels{Error: err, Message: "Failed to exec context DJ", Code: FailedToInsertQuery, Details: map[string]interface{}{"Query": decompteJoursQuery}}
 	}
 
 	decompteMensuelQuery := `
@@ -57,12 +57,12 @@ func InsertStructure(ctx context.Context, structure modals.Structure, userId str
 		structure.DecompteMensuel.Octobre, structure.DecompteMensuel.Novembre, structure.DecompteMensuel.Decembre,
 	)
 	if err != nil {
-		return 0, &errorModels{Error: err, Message: "Failed to insert query to decompte_mensuel table structure", Code: 11}
+		return 0, &errorModels{Error: err, Message: "Failed to exec context DM", Code: FailedToInsertQuery, Details: map[string]interface{}{"Query": decompteMensuelQuery}}
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return 0, &errorModels{Error: err, Message: "Failed to commit transaction structure", Code: 12}
+		return 0, &errorModels{Error: err, Message: "Failed to commit tx S", Code: FailedToCommitTx, Details: map[string]interface{}{"tx": tx}}
 	}
 	return structureId, nil
 }
