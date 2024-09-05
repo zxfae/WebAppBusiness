@@ -18,7 +18,7 @@ export default function UserProfileForm({ onLoginSuccess }: UserProfileFormProps
     
     const [isLoading, setIsLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(false);
-    const [ErrMessage, setErrMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -26,7 +26,7 @@ export default function UserProfileForm({ onLoginSuccess }: UserProfileFormProps
             ...prevState,
             [name]: value
         }));
-        setErrMessage('');
+        setErrorMessage('');
     };
 
     const resetForm = () => {
@@ -36,7 +36,7 @@ export default function UserProfileForm({ onLoginSuccess }: UserProfileFormProps
             email: '',
             password: ''
         });
-        setErrMessage(''); 
+        setErrorMessage(''); 
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,13 +63,13 @@ export default function UserProfileForm({ onLoginSuccess }: UserProfileFormProps
                 resetForm();
                 onLoginSuccess();
             } else {
-                const ErrData = await response.json();
-                console.Err('Erreur de serveur:', ErrData);
-                setErrMessage(ErrData.message || 'Erreur lors de la connexion ou de la création de l\'utilisateur');
+                const errorData = await response.json();
+                console.error('Erreur de serveur:', errorData);
+                setErrorMessage(errorData.message || 'Erreur lors de la connexion ou de la création de l\'utilisateur');
             }
-        } catch (Err) {
-            console.Err('Erreur:', Err);
-            setErrMessage('Erreur lors de la connexion ou de la création de l\'utilisateur');
+        } catch (error) {
+            console.error('Erreur:', error);
+            setErrorMessage('Erreur lors de la connexion ou de la création de l\'utilisateur');
             setIsLoading(false);
         }
     };
@@ -127,8 +127,8 @@ export default function UserProfileForm({ onLoginSuccess }: UserProfileFormProps
                         >
                             {isLoading ? 'Chargement...' : (isLogin ? 'Se connecter' : 'Créer un compte')}
                         </button>
-                        {ErrMessage && (
-                            <p className="mt-2 text-red-500 text-center">{ErrMessage}</p>
+                        {errorMessage && (
+                            <p className="mt-2 text-red-500 text-center">{errorMessage}</p>
                         )}
                     </form>
                     <p className="mt-4 text-center text-gray-600">

@@ -13,7 +13,6 @@ import {
 import { DeleteIcon } from "./components/DeleteIcon";
 import { EyeIcon } from "./components/EyeIcon";
 import { EditIcon } from "./components/EditIcon";
-import ChartsNmensuel from "./components/prodcharts";
 import ChartsProd from "./components/prodcharts";
 
 interface ProductionType {
@@ -63,7 +62,7 @@ const messagesByStep = {
   },
 };
 
-const ProductionTableForm: React.FC = () => {
+const FinancementForm: React.FC = () => {
   const [step, setStep] = useState<1 | 2 >(1);
   const [productionData, setProductionData] = useState({
     production: '',
@@ -566,31 +565,6 @@ const ProductionTableForm: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="mb-8 flex space-x-4">
-        <div className="bg-slate-100 flex-1 p-4 border border-gray-300 rounded-lg shadow-md">
-          <h2 className="mt-6 mb-10 text-black text-4xl bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent font-semibold mb-4 text-center">
-          <p>{messagesByStep[step].title}</p>
-          </h2>
-          <p className="text-black text-center mb-2 text-xl font-medium">
-          <p>{messagesByStep[step].content}</p>
-          </p>
-        </div>
-        <div className="justify-content-center bg-white flex-1 p-4 border border-gray-300 rounded-lg shadow-md flex items-center justify-center">
-          <div style={{ width: '340px', height: '340px' }} className="justify-content-center bg-white flex-1 p-4 border border-gray-300 rounded-lg shadow-md flex items-center justify-center">
-            {step === 1 && (
-              <ChartsProd
-                data={[
-                  parseInt(productionData.production, 10) || 0,
-                  parseInt(productionData.gestionclient, 10) || 0,
-                  parseInt(productionData.interprofession, 10) || 0,
-                  parseInt(productionData.formation, 10) || 0,
-                  parseInt(productionData.entretien, 10) || 0
-                ]}
-              />
-            )}
-          </div>  
-          </div>
-      </div>
 
       <form onSubmit={handleSubmit}>
         <Table aria-label="Example table with custom cells" className="min-w-full">
@@ -616,7 +590,7 @@ const ProductionTableForm: React.FC = () => {
           </TableBody>
         </Table>
 
-        <div className="flex justify-between mt-4">
+        <div className="mb-3 flex justify-between mt-2">
           {step > 1 && (
             <button
               type="button"
@@ -637,8 +611,33 @@ const ProductionTableForm: React.FC = () => {
           </button>
         </div>
       </form>
+      <div className="mb-8 flex space-x-4">
+        <div className="bg-slate-100 flex-1 p-4 border border-gray-300 rounded-lg shadow-md">
+          <h2 className="mt-6 mb-10 text-black text-4xl bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent font-semibold mb-4 text-center">
+          <p>{messagesByStep[step].title}</p>
+          </h2>
+          <p className="text-black text-center mb-2 text-xl font-medium">
+          <p>{messagesByStep[step].content}</p>
+          </p>
+        </div>
+        <div className="justify-content-center bg-white flex-1 p-4 border border-gray-300 rounded-lg shadow-md flex items-center justify-center">
+          <div style={{ width: '340px', height: '340px' }} className="justify-content-center bg-white flex-1 p-4 border border-gray-300 rounded-lg shadow-md flex items-center justify-center">
+            {step === 1 && (
+              <ChartsProd
+                data={[
+                  parseInt(productionData.production, 10) || 0,
+                  parseInt(productionData.gestionclient, 10) || 0,
+                  parseInt(productionData.interprofession, 10) || 0,
+                  parseInt(productionData.formation, 10) || 0,
+                  parseInt(productionData.entretien, 10) || 0
+                ]}
+              />
+            )}
+          </div>  
+          </div>
+      </div>
     </div>
   );
 };
 
-export default ProductionTableForm;
+export default FinancementForm;

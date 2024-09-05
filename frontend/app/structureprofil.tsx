@@ -93,11 +93,11 @@ export default function StructureProfilForm() {
                 if (response.ok) {
                     alert('Structure créée avec succès!');
                 } else {
-                    const ErrData = await response.json();
-                    alert(`Erreur: ${ErrData.message || 'Erreur lors de la création de la structure'}`);
+                    const errorData = await response.json();
+                    alert(`Erreur: ${errorData.message || 'Erreur lors de la création de la structure'}`);
                 }
-            } catch (Err) {
-                console.Err('Erreur:', Err);
+            } catch (error) {
+                console.error('Erreur:', error);
                 alert('Erreur lors de la création de la structure');
                 setIsLoading(false);
             }

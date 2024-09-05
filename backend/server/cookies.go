@@ -21,7 +21,7 @@ func (sm *SessionManager) CreateSession(userid string) (string, *http.Cookie) {
 	//Create session with UUID
 	sessionID := database.GenerateSessionID()
 	//New cookie expiration 24h
-	expiry := time.Now().Add(24 * time.Hour)
+	expiry := time.Now().Add(24 * time.Second)
 
 	//Create new user Session struct with
 	// => UUID id && expiration Time

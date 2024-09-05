@@ -5,6 +5,8 @@ import UserProfileForm from '../app/userprofil';
 import StructureProfilForm from './structureprofil';
 import DashBoard from './dashboard';
 import ProductionTableForm from './production';
+import FinancementForm from './financement';
+import PTSForm from './tresorerie';
 
 export default function Home() {
     //OK state
@@ -30,9 +32,9 @@ export default function Home() {
             case 'connexion':
                 return <UserProfileForm onLoginSuccess={handleLoginSuccess} />;
             case 'financement':
-                return <h1 className="text-gray-800 text-2xl font-bold">Bilan De Financement</h1>;
+                return <FinancementForm/>;
             case 'tresorerie':
-                return <h1 className="text-gray-800 text-2xl font-bold">Plan Trésorerie</h1>;
+                return <PTSForm/>;
             case 'amortissement':
                 return <h1 className="text-gray-800 text-2xl font-bold">Amortissement Linéaire</h1>;
             case 'production':
@@ -51,25 +53,10 @@ export default function Home() {
                         <li>
                             <button
                                 onClick={() => {
-                                    if (isAuth) setActiveSection('connexion');
-                                }}
-                                aria-pressed={activeSection === 'profile'}
-                                className={`block py-2 px-4 rounded-lg text-left w-full ${
-                                    activeSection === 'connexion'
-                                        ? 'bg-blue-500 text-white'
-                                        : 'text-gray-700 hover:bg-gray-200'
-                                }`}
-                            >
-                                Connexion
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => {
                                     if (isAuth) setActiveSection('dashboard');
                                 }}
                                 aria-pressed={activeSection === 'dashboard'}
-                                className={`block py-2 px-4 rounded-lg text-left w-full ${
+                                className={`mb-2 border-1 border-blue-300 text-center block py-2 px-4 rounded-lg text-left w-full ${
                                     activeSection === 'dashboard'
                                         ? 'bg-blue-500 text-white'
                                         : 'text-gray-700 hover:bg-gray-200'
@@ -84,7 +71,7 @@ export default function Home() {
                                     if (isAuth) setActiveSection('basic');
                                 }}
                                 aria-pressed={activeSection === 'basic'}
-                                className={`block py-2 px-4 rounded-lg text-left w-full ${
+                                className={`mb-2 border-1 border-blue-300 text-center block py-2 px-4 rounded-lg text-left w-full ${
                                     activeSection === 'basic'
                                         ? 'bg-blue-500 text-white'
                                         : 'text-gray-700 hover:bg-gray-200'
@@ -99,13 +86,13 @@ export default function Home() {
                                     if (isAuth) setActiveSection('production');
                                 }}
                                 aria-pressed={activeSection === 'production'}
-                                className={`block py-2 px-4 rounded-lg text-left w-full ${
+                                className={`mb-2 border-1 border-blue-300 text-center block py-2 px-4 rounded-lg text-left w-full ${
                                     activeSection === 'production'
                                         ? 'bg-blue-500 text-white'
                                         : 'text-gray-700 hover:bg-gray-200'
                                 }`}
                             >
-                                Production
+                                Production de l'entreprise
                             </button>
                         </li>
                         <li>
@@ -114,13 +101,13 @@ export default function Home() {
                                     if (isAuth) setActiveSection('financement');
                                 }}
                                 aria-pressed={activeSection === 'financement'}
-                                className={`block py-2 px-4 rounded-lg text-left w-full ${
+                                className={`mb-2 border-1 border-blue-300 text-center block py-2 px-4 rounded-lg text-left w-full ${
                                     activeSection === 'financement'
                                         ? 'bg-blue-500 text-white'
                                         : 'text-gray-700 hover:bg-gray-200'
                                 }`}
                             >
-                                Plan de Financement
+                                Plan de Financement Simplifié
                             </button>
                         </li>
                         <li>
@@ -129,13 +116,13 @@ export default function Home() {
                                     if (isAuth) setActiveSection('tresorerie');
                                 }}
                                 aria-pressed={activeSection === 'tresorerie'}
-                                className={`block py-2 px-4 rounded-lg text-left w-full ${
+                                className={`mb-2 border-1 border-blue-300 text-center block py-2 px-4 rounded-lg text-left w-full ${
                                     activeSection === 'tresorerie'
                                         ? 'bg-blue-500 text-white'
                                         : 'text-gray-700 hover:bg-gray-200'
                                 }`}
                             >
-                                Plan Trésorerie
+                                Plan de Trésorerie
                             </button>
                         </li>
                         <li>
@@ -144,13 +131,28 @@ export default function Home() {
                                     if (isAuth) setActiveSection('amortissement');
                                 }}
                                 aria-pressed={activeSection === 'amortissement'}
-                                className={`block py-2 px-4 rounded-lg text-left w-full ${
+                                className={`mb-2 border-1 border-blue-300 text-center block py-2 px-4 rounded-lg text-left w-full ${
                                     activeSection === 'amortissement'
                                         ? 'bg-blue-500 text-white'
                                         : 'text-gray-700 hover:bg-gray-200'
                                 }`}
                             >
                                 Amortissement Linéaire
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={() => {
+                                    if (isAuth) setActiveSection('connexion');
+                                }}
+                                aria-pressed={activeSection === 'profile'}
+                                className={`mb-2 border-1 border-blue-300 text-center block py-2 px-4 rounded-lg text-left w-full ${
+                                    activeSection === 'connexion'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-700 hover:bg-gray-200'
+                                }`}
+                            >
+                                Connexion
                             </button>
                         </li>
                     </ul>

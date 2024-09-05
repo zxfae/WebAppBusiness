@@ -1,10 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { Chart, ChartConfiguration } from 'chart.js/auto';
-import ChartsNmensuel from './components/charsnmensuel';
-import PieChars from './components/prodcharts';
-import ChartsEncDec from './components/encDecCharts';
-import Image from 'next/image';
-import ChartsProd from './components/prodcharts';
 
 
 export default function DashBoard() {
