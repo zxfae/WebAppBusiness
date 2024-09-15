@@ -1,7 +1,7 @@
 package database
 
 import (
-	"WebAppFinance/backend/modals"
+	"WebAppFinance/modals"
 	"context"
 	"log"
 )

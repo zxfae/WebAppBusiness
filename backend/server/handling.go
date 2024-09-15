@@ -1,10 +1,12 @@
 package server
 
 import (
-	database "WebAppFinance/backend/db"
-	"WebAppFinance/backend/modals"
+	database "WebAppFinance/db"
+	"WebAppFinance/modals"
 	"bytes"
+	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -15,6 +17,47 @@ var sessionManager *SessionManager
 
 func init() {
 	sessionManager = NewSessionManager()
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	// Only allow POST requests
+	if r.Method != http.MethodPost {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"message": "Invalid request method"}`, http.StatusMethodNotAllowed)
+		return
+	}
+
+	var user modals.User
+	// Decode the user credentials from the request body
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"message": "Invalid request payload"}`, http.StatusBadRequest)
+		return
+	}
+
+	// Call LoginUser to verify credentials
+	ok, err := database.LoginUser(ctx, user)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, fmt.Sprintf(`{"message": "%s"}`, err.Message), http.StatusUnauthorized)
+		return
+	}
+
+	// Check if the login was successful (e.g., check if user exists)
+	if ok == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"message": "Invalid credentials"}`, http.StatusUnauthorized)
+		return
+	}
+
+	// Create a session if the login was successful
+	sessionID, _ := sessionManager.CreateSession(w, "userID")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message":"Login successful", "session_id":"` + sessionID + `"}`))
+
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,8 +84,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Create a sessionCookie
-	sessionID, cookie := sessionManager.CreateSession(userId)
-	http.SetCookie(w, cookie)
+	sessionID, _ := sessionManager.CreateSession(w, userId)
 	//Set content-type header, write code 201
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -214,6 +256,90 @@ func productionHandler(w http.ResponseWriter, r *http.Request) {
 		Message: "Production created successfully",
 		Data: map[string]interface{}{
 			"productionId": productionID,
+		},
+	})
+}
+
+func tresoHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Received request to tresoHandler")
+
+	// Method must be POST. Check method
+	if r.Method != http.MethodPost {
+		handleError(w, nil, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Get and validate the session cookie
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		handleError(w, err, "Unauthorized: No session cookie", http.StatusUnauthorized)
+		return
+	}
+	sessionID := cookie.Value
+	log.Printf("Session ID: %s", sessionID)
+
+	// Check if session exists and is valid
+	sessionManager.mutex.Lock()
+	session, exists := sessionManager.sessions[sessionID]
+	sessionManager.mutex.Unlock()
+
+	if !exists || time.Now().After(session.Expiry) {
+		log.Printf("Session not found or expired for ID: %s", sessionID)
+		handleError(w, nil, "Unauthorized: Invalid or expired session", http.StatusUnauthorized)
+		return
+	}
+
+	// Read request body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		handleError(w, err, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	log.Printf("Request body: %s", string(body))
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	// Decode JSON payload into treso struct
+	var treso modals.Treso
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&treso); err != nil {
+		handleError(w, err, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	log.Printf("Decoded treso: %+v", treso)
+
+	// Get tresoCE && tresoFF details from the decoded treso
+	tresoCE := treso.TresoCE
+	tresoFF := treso.TresoFF
+
+	// Log
+	log.Printf("TresoCE: %+v", tresoCE)
+	log.Printf("TresoFF: %+v", tresoFF)
+
+	// Check if the user exists before inserting the production
+	userExists, err := database.CheckUserExists(r.Context(), session.UserID)
+	if err != nil || !userExists {
+		log.Printf("Error checking user existence for ID: %s", session.UserID)
+		handleError(w, err, "Invalid user ID: User does not exist", http.StatusBadRequest)
+		return
+	}
+
+	// Insert the treso into the database
+	tresoID, errModel := database.InsertTreso(r.Context(), treso, tresoCE, tresoFF, session.UserID)
+	if errModel != nil {
+		handleError(w, errModel.Error, "Failed to insert treso", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("treso created successfully with ID: %d", tresoID)
+
+	// Set the content-type header and return a successful response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(modals.Response{
+		Message: "treso created successfully",
+		Data: map[string]interface{}{
+			"tresoId": tresoID,
 		},
 	})
 }

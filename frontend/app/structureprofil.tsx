@@ -7,17 +7,17 @@ import { FormEvent, ChangeEvent, useState, useEffect } from "react";
 export default function StructureProfilForm() {
     const [step, setStep] = useState(1);
     const [structureData, setStructureData] = useState({
-        name: 'q',
-        codeape: 'q',
-        statut: 'q',
-        date: '11-11-1111'
+        name: '',
+        codeape: '',
+        statut: '',
+        date: ''
     });
 
     const [decompteData, setDecompteData] = useState({
-        joursAnnuels: '365',
-        joursWeekend: '104',
-        joursCongésPayés: '25',
-        joursFériés: '10'
+        joursAnnuels: '',
+        joursWeekend: '',
+        joursCongésPayés: '',
+        joursFériés: ''
     });
 
     const [decompteMensuel, setDecompteMensuel] = useState({

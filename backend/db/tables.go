@@ -106,3 +106,50 @@ func createProdFinanceDetails() *errorModels {
     )`
 	return executeQuery(query, "prodFinanceDetails")
 }
+
+func createPTreso() *errorModels {
+	query := `
+    CREATE TABLE IF NOT EXISTS ptreso(
+        id SERIAL PRIMARY KEY,
+        userId TEXT NOT NULL,
+        sbs INTEGER NOT NULL,
+        cotpat INTEGER NOT NULL,
+        schef INTEGER NOT NULL,
+        FOREIGN KEY(userId) REFERENCES users(userId)
+
+    )`
+	return executeQuery(query, "ptreso")
+}
+
+func createPTresoCE() *errorModels {
+	query := `
+    CREATE TABLE IF NOT EXISTS ptresochargesexp(
+        id SERIAL PRIMARY KEY,
+        treso_id INTEGER NOT NULL,
+        fournitures INTEGER NOT NULL,
+        carburant INTEGER NOT NULL,
+        entretiens INTEGER NOT NULL,
+        fraisgen INTEGER NOT NULL,
+        edf INTEGER NOT NULL,
+        deplacement INTEGER NOT NULL,
+        FOREIGN KEY(treso_id) REFERENCES ptreso(id)
+
+    )`
+	return executeQuery(query, "ptreso")
+}
+
+func createPTresoFF() *errorModels {
+	query := `
+    CREATE TABLE IF NOT EXISTS ptresoff(
+    id SERIAL PRIMARY KEY,
+    treso_id INTEGER NOT NULL,
+    prestaext INTEGER NOT NULL,
+    assurc INTEGER NOT NULL,
+    assuraut INTEGER NOT NULL,
+    loyerlocaux INTEGER NOT NULL,
+    empruntsbanc INTEGER NOT NULL,
+    publicit INTEGER NOT NULL,
+    FOREIGN KEY(treso_id) REFERENCES ptreso(id)
+)`
+	return executeQuery(query, "ptreso")
+}

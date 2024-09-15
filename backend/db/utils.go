@@ -13,6 +13,7 @@ import (
 
 var db *sql.DB
 
+// Struct error
 type errorModels struct {
 	Error   error
 	Message string
@@ -20,6 +21,7 @@ type errorModels struct {
 	Details map[string]interface{}
 }
 
+// Const for errorModels, Code.
 const (
 	ErrFailedToLogin         = 1
 	ErrInvalidPassword       = 2
@@ -30,8 +32,12 @@ const (
 	TableCreationError       = 7
 	OpenDbFailed             = 8
 	PingDbFailed             = 9
+	QueryExecFailed          = 10
+	FailedToFetch            = 11
+	ErrUserNotFound          = 12
 )
 
+// UnitTest
 var (
 	GenerateSessionIDFunc = GenerateSessionID
 	HashPasswordFunc      = HashPassword
@@ -51,6 +57,7 @@ func HashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
+// Verification already not used
 func CheckEmailExists(ctx context.Context, email string) (bool, error) {
 	query := "SELECT COUNT(*) FROM Users WHERE email = ?"
 	var count int

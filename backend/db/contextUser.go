@@ -1,8 +1,9 @@
 package database
 
 import (
-	"WebAppFinance/backend/modals"
+	"WebAppFinance/modals"
 	"context"
+	"database/sql"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -57,4 +58,36 @@ func RegisterUser(ctx context.Context, user modals.User) (int, string, *errorMod
 	}
 
 	return userID, userId, nil
+}
+
+func GetUser(ctx context.Context, userId string) (*modals.User, *errorModels) {
+	query := `
+	SELECT lastname, firstname FROM users
+	WHERE userId = $1
+	`
+
+	var user modals.User
+
+	err := db.QueryRowContext(ctx, query, userId).Scan(
+		&user.Lastname,
+		&user.Firstname,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, &errorModels{
+				Error:   err,
+				Message: "User not found",
+				Code:    ErrUserNotFound,
+				Details: map[string]interface{}{"UserID": userId},
+			}
+		}
+		return nil, &errorModels{
+			Error:   err,
+			Message: "Failed to fetch user",
+			Code:    FailedToFetch,
+			Details: map[string]interface{}{"UserID": userId},
+		}
+	}
+	return &user, nil
 }

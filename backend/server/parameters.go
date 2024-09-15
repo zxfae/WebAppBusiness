@@ -8,7 +8,7 @@ import (
 // Serve parameters Server with protection
 func ServerParameters(handler http.Handler, Request int) *http.Server {
 	return &http.Server{
-		Addr:              "127.0.0.1:8080",
+		Addr:              ":8080",
 		ReadTimeout:       10 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout:      10 * time.Second,

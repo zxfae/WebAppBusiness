@@ -1,7 +1,7 @@
 package server
 
 import (
-	database "WebAppFinance/backend/db"
+	database "WebAppFinance/db"
 	"net/http"
 	"time"
 )
@@ -14,14 +14,14 @@ func NewSessionManager() *SessionManager {
 }
 
 // Return new session ID and cookie
-func (sm *SessionManager) CreateSession(userid string) (string, *http.Cookie) {
+func (sm *SessionManager) CreateSession(w http.ResponseWriter, userid string) (string, *http.Cookie) {
 	sm.InvalidateSession(userid)
 	sm.mutex.Lock()
 	defer sm.mutex.Unlock()
 	//Create session with UUID
 	sessionID := database.GenerateSessionID()
 	//New cookie expiration 24h
-	expiry := time.Now().Add(24 * time.Second)
+	expiry := time.Now().Add(24 * time.Hour)
 
 	//Create new user Session struct with
 	// => UUID id && expiration Time
@@ -33,12 +33,13 @@ func (sm *SessionManager) CreateSession(userid string) (string, *http.Cookie) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    sessionID,
-		Expires:  expiry,
+		Expires:  time.Now().Add(24 * time.Hour),
 		HttpOnly: true,
 		Path:     "/",
 		SameSite: http.SameSiteStrictMode,
 	}
 
+	http.SetCookie(w, cookie)
 	return sessionID, cookie
 }
 

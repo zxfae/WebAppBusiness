@@ -1,8 +1,8 @@
 package main
 
 import (
-	database "WebAppFinance/backend/db"
-	"WebAppFinance/backend/server"
+	database "WebAppFinance/db"
+	"WebAppFinance/server"
 )
 
 func main() {

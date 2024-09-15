@@ -61,6 +61,7 @@ export default function UserProfileForm({ onLoginSuccess }: UserProfileFormProps
             setIsLoading(false);
             if (response.ok) {
                 resetForm();
+                setIsLoading(false)
                 onLoginSuccess();
             } else {
                 const errorData = await response.json();

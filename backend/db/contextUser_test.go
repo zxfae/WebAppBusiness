@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"WebAppFinance/backend/modals"
+	"WebAppFinance/modals"
 
 	"github.com/DATA-DOG/go-sqlmock"
 )

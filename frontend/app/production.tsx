@@ -13,7 +13,6 @@ import {
 import { DeleteIcon } from "./components/DeleteIcon";
 import { EyeIcon } from "./components/EyeIcon";
 import { EditIcon } from "./components/EditIcon";
-import ChartsNmensuel from "./components/prodcharts";
 import ChartsProd from "./components/prodcharts";
 
 interface ProductionType {

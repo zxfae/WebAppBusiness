@@ -1,7 +1,7 @@
 package server
 
 import (
-	"WebAppFinance/backend/modals"
+	"WebAppFinance/modals"
 	"encoding/json"
 	"log"
 	"net/http"

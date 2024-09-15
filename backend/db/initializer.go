@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"os"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -11,8 +12,7 @@ import (
 // Open and Check DB
 func initialisation() *errorModels {
 	var err error
-	connStr := "postgres://plec:example@localhost:5432/business?sslmode=disable"
-	db, err = sql.Open("postgres", connStr)
+	db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 
 	if err != nil {
 		return &errorModels{Error: err, Message: "Failed connect to db", Code: OpenDbFailed, Details: map[string]interface{}{"db": db}}

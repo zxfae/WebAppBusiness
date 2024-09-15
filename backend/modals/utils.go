@@ -19,6 +19,7 @@ type User struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
+
 type Structure struct {
 	Name             string          `json:"name"`
 	Codeape          string          `json:"codeape"`
@@ -66,4 +67,30 @@ type ProductionFinanceDetail struct {
 	Prixserv int `json:"prixserv"`
 	Cajours  int `json:"cajours"`
 	Caann    int `json:"caann"`
+}
+
+type Treso struct {
+	SalaireBrut int     `json:"SalaireBrut"`
+	CotPat      int     `json:"CotPat"`
+	Schef       int     `json:"Schef"`
+	TresoCE     TresoCE `json:"TresoCE"`
+	TresoFF     TresoFF `json:"TresoFF"`
+}
+
+type TresoCE struct {
+	Fournitures int `json:"Fournitures"`
+	Carburant   int `json:"Carburant"`
+	Entretiens  int `json:"Entretiens"`
+	FraisGen    int `json:"FraisGen"`
+	Edf         int `json:"Edf"`
+	Deplacement int `json:"Deplacement"`
+}
+
+type TresoFF struct {
+	Prestaext int `json:"Prestaext"`
+	Assurc    int `json:"Assurc"`
+	Assuraut  int `json:"Assuraut"`
+	LL        int `json:"LL"`
+	Bank      int `json:"Bank"`
+	Pub       int `json:"Pub"`
 }
